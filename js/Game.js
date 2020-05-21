@@ -4,14 +4,14 @@ class Game {
         this.missed = 0;
         this.lives = 5;
         this.phrases = this.createPhrases();
-        this.activePhrase = this.getRandomPhrase();
+        this.activePhrase = null;
     }
     /**
      * Creates phrases for use in game
      * @return {array} An array of phrases that could be used in the game
      */
     createPhrases() {
-        return ["Fired Chicken", "New York", "Cookie Jar", "Hello World", "Miami"]
+        return ["Fried Chicken", "New York", "Cookie Jar", "Hello World", "Miami"]
     }
     /**
     * Selects random phrase from phrases property
@@ -21,7 +21,7 @@ class Game {
         let phrases = this.phrases
         let phrasePicker = Math.floor( phrases.length * Math.random())
         let randomPhrase = phrases[phrasePicker]
-        return {phrase: randomPhrase}
+        return randomPhrase
         // phrase = new Phrase(randomPhrase)
     }
     /**
@@ -30,7 +30,8 @@ class Game {
     startGame() {
         let startScreen = document.getElementById("overlay");
         startScreen.style.display = "none";
-        phrase = new Phrase(this.activePhrase.phrase);
+        this.activePhrase = this.getRandomPhrase()
+        phrase = new Phrase(this.activePhrase);
         phrase.addPhraseToDisplay();
         
 
@@ -39,17 +40,28 @@ class Game {
 
     }
     handleInteraction(button) { 
+        let isButton = button.tagName == "BUTTON";
+        
+        if(isButton) { //before we validate input, we want to make sure the parameter was a button element
+            let letter = button.innerText;
+            button.disabled = true;
 
-        phrase.checkLetter(button);
 
-        let gameWon = this.checkForWin();
-        let gameLose = this.missed == this.lives;
+            if (phrase.checkLetter(letter)) {  // statement is true if player found a letter
+                phrase.showMatchedLetter(letter);
+                button.classList.add("chosen");
+            } else {    // if player did not find letter we'll run the following
+                this.removeLife();
+                button.classList.add("wrong");
+            }
 
-        if (gameWon) {
-            this.gameOver(true);
-        } else if (gameLose) {
-            this.gameOver(false);
+            if (this.checkForWin()) { // show gameOver overlay if player won game
+                this.gameOver(true);
+            }
+        } else { //if parameter was not a button element, we'll go try and find the corresponding button element(if any).
+            this.findButtonElement(button)
         }
+        
     }
     /**
     * Checks for winning move
@@ -57,29 +69,39 @@ class Game {
     */
     checkForWin() {
         let hiddenCharacters = phraseContainer.querySelectorAll("li.hide");
-        let phraseFound = hiddenCharacters.length == 0;
-        if (phraseFound) {
+        let gameWon = hiddenCharacters.length == 0;
+
+        if (gameWon) {
             return true
         } else {
             return false
         }
+
     }
     /**
     * Increases the value of the missed property
     * Removes a life from the scoreboard
     * Checks if player has remaining lives and ends game if player is out
-    * "phrase.checkLetter()" will trigger this if condition is met
     */
     removeLife() {
         let heartIcons = document.querySelectorAll(".tries img");
+        
         heartIcons[this.missed].src = "images/lostHeart.png";
         this.missed += 1;
+
+
+        let gameLose = this.missed == this.lives;
+        if (gameLose) {
+            this.gameOver(false);
+        }
     }
     /**
     * Displays game over message
     * @param {boolean} gameWon - Whether or not the user won the game
     */
     gameOver(gameWon) {
+
+
         let startScreen = document.getElementById("overlay");
         let gameOverMsg = startScreen.querySelector("#game-over-message");
 
@@ -112,23 +134,23 @@ class Game {
         }
    }
    /**
-    * this will handle any key pressed
+    * if player input was not a button element, this will find a corresponding button element(if any).
     */
-    validateKeyboardKey(key) {
+    findButtonElement(param) {
         
-        let keyPress = key.toLowerCase();
-        let isLetter = /^[a-z]$/.test(keyPress);
-        // 1. code will execute if keypress is a letter
+        let isLetter = /^[a-z]$/.test(param);
+        // 1. code will execute if parameter is a letter
         if (isLetter) {
+            let Letter = param.toLowerCase();
             let keyboardBtnElement;
             let digitalKeyboard = keyboard.querySelectorAll('button.key');
-            // 2. get button element that that matches keypress
+            // 2. get button element that that matches parameter
             digitalKeyboard.forEach(button => {
-                if (button.innerText == keyPress) {
+                if (button.innerText == Letter) {
                     keyboardBtnElement = button;
                 }
             });
-            // 3. if button element has not been selected. We'll select the button element
+            // 3. if button element has not been selected. We'll select the button element and pass it to the game.handleInteraction
             let letterNotYetSelected = !keyboardBtnElement.classList.contains("chosen") && !keyboardBtnElement.classList.contains("wrong");
             if (letterNotYetSelected) {
                 this.handleInteraction(keyboardBtnElement)

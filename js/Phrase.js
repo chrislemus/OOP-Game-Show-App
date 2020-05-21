@@ -30,21 +30,12 @@ class Phrase{
     * Checks if passed letter is in phrase
     * @param (string) letter - Letter to check
     */
-    checkLetter(button) {
-        let letter = button.innerText;
-        let phrase = this.phrase;
-        let isMatch = phrase.includes(letter); // this will output boolean value: if 'true' letter is a match
-
-        button.disabled = true;
-
-        if (isMatch) { 
-            this.showMatchedLetter(letter);
-            button.classList.add("chosen");
+    checkLetter(letter) {
+        if (this.phrase.includes(letter)) { 
+            return true
         } else {
-            game.removeLife();
-            button.classList.add("wrong");
-        }
-        
+            return false
+        }    
     }
     /**
     * Displays passed letter on screen after a match is found

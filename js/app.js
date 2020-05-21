@@ -12,18 +12,12 @@ startGameBtn.addEventListener('click', () => {
 
 let keyboard = document.getElementById("qwerty");
 keyboard.addEventListener('click', e => {
-    if (e.target.tagName == "BUTTON") {
-        let button = e.target;
-        game.handleInteraction(button);
-    }
+    game.handleInteraction(e.target);
+
 });
 
 document.addEventListener('keyup', (e) => {
-    let startScreen = document.getElementById("overlay");
-    let gameIsRunning = startScreen.style.display == "none"
-    if (gameIsRunning) { //game will run key pressed only if game is running
-        game.validateKeyboardKey(e.key);
-    }
+    game.handleInteraction(e.key);
 })
 
 
@@ -39,7 +33,7 @@ const grandmaVoice = new Audio('../clips/toasty.mp3');
 
 //this will display grandma every time player guessed letter correct
 function showGrandma() {
-    grandmaVoice.play() //grandma voice will play
+    grandmaVoice.play(); //grandma voice will play
     let randomPicker = Math.floor(Math.random() * grandmaMessages.length); //this will select random index value of messages
 
     grandmaMsg.innerText = grandmaMessages[randomPicker]; //grandma message will show
