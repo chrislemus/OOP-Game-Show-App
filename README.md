@@ -1,5 +1,5 @@
 # OOP Game Show App
->Online game show app built with vanilla JS and using the Object Oriented Prgramming paradigm.
+>Online game show app built with vanilla JS and using the Object-Oriented Programming paradigm.
 
 
 **Table of Contents**  
